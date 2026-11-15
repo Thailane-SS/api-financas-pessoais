@@ -1,3 +1,6 @@
+from typing import Annotated
+
+from fastapi import Depends
 from sqlmodel import Session, SQLModel, create_engine
 
 URL_BANCO = "sqlite:///financas.db"
@@ -12,3 +15,6 @@ def criar_banco_e_tabelas():
 def obter_sessao():
     with Session(engine) as sessao:
         yield sessao
+
+
+SessaoDep = Annotated[Session, Depends(obter_sessao)]

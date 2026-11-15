@@ -10,9 +10,20 @@ class TipoTransacao(str, Enum):
     despesa = "despesa"
 
 
-class Categoria(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
+class CategoriaBase(SQLModel):
     nome: str = Field(index=True, unique=True, max_length=50)
+
+
+class Categoria(CategoriaBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+
+
+class CategoriaCriar(CategoriaBase):
+    pass
+
+
+class CategoriaLer(CategoriaBase):
+    id: int
 
 
 class Transacao(SQLModel, table=True):
