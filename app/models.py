@@ -81,3 +81,18 @@ class TransacaoAtualizar(SQLModel):
     tipo: TipoTransacao | None = None
     data: date | None = None
     categoria_id: int | None = None
+    # ---------- Resumo mensal ----------
+
+class GastoPorCategoria(SQLModel):
+    categoria_id: int
+    categoria: str
+    total: Decimal
+
+
+class ResumoMensal(SQLModel):
+    ano: int
+    mes: int
+    total_receitas: Decimal
+    total_despesas: Decimal
+    saldo: Decimal
+    despesas_por_categoria: list[GastoPorCategoria]
