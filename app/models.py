@@ -26,10 +26,29 @@ class CategoriaLer(CategoriaBase):
     id: int
 
 
-class Transacao(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
+class TransacaoBase(SQLModel):
     descricao: str = Field(max_length=200)
     valor: Decimal = Field(max_digits=10, decimal_places=2)
     tipo: TipoTransacao
     data: date
     categoria_id: int = Field(foreign_key="categoria.id")
+
+
+class Transacao(TransacaoBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+
+
+class TransacaoCriar(TransacaoBase):
+    pass
+
+
+class TransacaoLer(TransacaoBase):
+    id: int
+
+
+class TransacaoAtualizar(SQLModel):
+    descricao: str | None = None
+    valor: Decimal | None = None
+    tipo: TipoTransacao | None = None
+    data: date | None = None
+    categoria_id: int | None = None

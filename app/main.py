@@ -4,7 +4,7 @@ from fastapi import FastAPI
 
 from app import models  # noqa: F401
 from app.database import criar_banco_e_tabelas
-from app.routers import categorias
+from app.routers import categorias, transacoes
 
 
 @asynccontextmanager
@@ -21,6 +21,7 @@ app = FastAPI(
 )
 
 app.include_router(categorias.router)
+app.include_router(transacoes.router)
 
 
 @app.get("/")
