@@ -1,9 +1,22 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
+
+from app import models  # noqa: F401
+from app.database import criar_banco_e_tabelas
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    criar_banco_e_tabelas()
+    yield
+
 
 app = FastAPI(
     title="API de Finanças Pessoais",
     description="API para registrar receitas e despesas e consultar resumos mensais.",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 
