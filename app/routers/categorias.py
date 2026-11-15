@@ -2,12 +2,18 @@ from fastapi import APIRouter, HTTPException, status
 from sqlmodel import select
 
 from app.database import SessaoDep
-from app.models import Categoria, CategoriaCriar, CategoriaLer
+from app.models import Categoria, CategoriaCriar, CategoriaLer, Erro
 
 router = APIRouter(prefix="/categorias", tags=["Categorias"])
 
 
-@router.post("", response_model=CategoriaLer, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=CategoriaLer,
+    status_code=status.HTTP_201_CREATED,
+    summary="Cadastrar categoria",
+    responses={409: {"model": Erro, "description": "Já existe uma categoria com esse nome"}},
+)
 def criar_categoria(dados: CategoriaCriar, sessao: SessaoDep):
     existente = sessao.exec(
         select(Categoria).where(Categoria.nome == dados.nome)
@@ -25,12 +31,17 @@ def criar_categoria(dados: CategoriaCriar, sessao: SessaoDep):
     return categoria
 
 
-@router.get("", response_model=list[CategoriaLer])
+@router.get("", response_model=list[CategoriaLer], summary="Listar categorias")
 def listar_categorias(sessao: SessaoDep):
     return sessao.exec(select(Categoria).order_by(Categoria.nome)).all()
 
 
-@router.get("/{categoria_id}", response_model=CategoriaLer)
+@router.get(
+    "/{categoria_id}",
+    response_model=CategoriaLer,
+    summary="Buscar categoria por id",
+    responses={404: {"model": Erro, "description": "Categoria não encontrada"}},
+)
 def buscar_categoria(categoria_id: int, sessao: SessaoDep):
     categoria = sessao.get(Categoria, categoria_id)
     if not categoria:

@@ -10,8 +10,14 @@ class TipoTransacao(str, Enum):
     despesa = "despesa"
 
 
+class Erro(SQLModel):
+    detail: str
+
+
+# ---------- Categorias ----------
+
 class CategoriaBase(SQLModel):
-    nome: str = Field(index=True, unique=True, max_length=50)
+    nome: str = Field(index=True, unique=True, min_length=1, max_length=50)
 
 
 class Categoria(CategoriaBase, table=True):
@@ -19,16 +25,21 @@ class Categoria(CategoriaBase, table=True):
 
 
 class CategoriaCriar(CategoriaBase):
-    pass
+    model_config = {
+        "str_strip_whitespace": True,
+        "json_schema_extra": {"examples": [{"nome": "Lazer"}]},
+    }
 
 
 class CategoriaLer(CategoriaBase):
     id: int
 
 
+# ---------- Transações ----------
+
 class TransacaoBase(SQLModel):
-    descricao: str = Field(max_length=200)
-    valor: Decimal = Field(max_digits=10, decimal_places=2)
+    descricao: str = Field(min_length=1, max_length=200)
+    valor: Decimal = Field(gt=0, max_digits=10, decimal_places=2)
     tipo: TipoTransacao
     data: date
     categoria_id: int = Field(foreign_key="categoria.id")
@@ -39,7 +50,20 @@ class Transacao(TransacaoBase, table=True):
 
 
 class TransacaoCriar(TransacaoBase):
-    pass
+    model_config = {
+        "str_strip_whitespace": True,
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "descricao": "Cinema com amigos",
+                    "valor": 45.00,
+                    "tipo": "despesa",
+                    "data": "2026-11-14",
+                    "categoria_id": 1,
+                }
+            ]
+        },
+    }
 
 
 class TransacaoLer(TransacaoBase):
@@ -47,8 +71,13 @@ class TransacaoLer(TransacaoBase):
 
 
 class TransacaoAtualizar(SQLModel):
-    descricao: str | None = None
-    valor: Decimal | None = None
+    model_config = {
+        "str_strip_whitespace": True,
+        "json_schema_extra": {"examples": [{"valor": 50.00}]},
+    }
+
+    descricao: str | None = Field(default=None, min_length=1, max_length=200)
+    valor: Decimal | None = Field(default=None, gt=0, max_digits=10, decimal_places=2)
     tipo: TipoTransacao | None = None
     data: date | None = None
     categoria_id: int | None = None
